@@ -128,7 +128,7 @@
             const password = document.getElementById('password1').value; 
             const farm_name = document.getElementById('farmName').value;
         
-            fetch("http://localhost:8085/register", {
+            fetch("https://farmapi-ox2q.onrender.com/register", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({first_name : first_name, last_name : last_name, email : email, password : password, farm_name : farm_name})
@@ -154,7 +154,7 @@
             const email = document.getElementById("username").value;
             const password = document.getElementById("password").value;
 
-            fetch("http://localhost:8085/login", {
+            fetch("https://farmapi-ox2q.onrender.com/login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({email : email, password : password}),
@@ -164,7 +164,7 @@
             .then (data => {
                 if (data.success) {
                     document.getElementById("message").textContent = "login sec";
-                    window.location.href = 'http://localhost:8080/dashboard.html';
+                    window.location.href = 'dashboard.html';
                 }
                 else {
                     document.getElementById("message").textContent = "login not sec";

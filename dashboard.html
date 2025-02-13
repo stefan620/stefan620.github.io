@@ -252,7 +252,7 @@
     </div>
 
     <script>
-fetch("http://localhost:8085/protected", { credentials: "include" })
+fetch("https://farmapi-ox2q.onrender.com/protected", { credentials: "include" })
   .then(response => response.json())
   .then(data => {
       if (!data.success) {
