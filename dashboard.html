@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farming App Dashboard</title>
+    <style>
+        /* General Styles */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background-image: url('farm-background.jpg'); /* Add your farm background image */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            color: #333;
+        }
+
+        /* Dashboard Container */
+        .dashboard {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white overlay */
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            color: #4CAF50; /* Green color for farm theme */
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-profile img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .user-profile span {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        /* Information Chart */
+        .info-chart {
+            padding: 15px;
+            background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white */
+            margin: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .info-chart h2 {
+            margin-top: 0;
+            color: #4CAF50; /* Green color for farm theme */
+        }
+
+        /* Menu */
+        .menu {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white */
+            margin: 0 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .menu button {
+            flex: 1 1 calc(50% - 20px); /* Two buttons per row on mobile */
+            padding: 10px;
+            font-size: 14px;
+            color: #fff;
+            background-color: #4CAF50; /* Green color for farm theme */
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .menu button:hover {
+            background-color: #45a049; /* Darker green on hover */
+        }
+
+        /* Function Templates */
+        .functions {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 10px;
+            gap: 10px;
+        }
+
+        .function-card {
+            flex: 1 1 calc(50% - 20px); /* Two cards per row on mobile */
+            padding: 15px;
+            background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white */
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .function-card h3 {
+            margin-top: 0;
+            font-size: 16px;
+            color: #4CAF50; /* Green color for farm theme */
+        }
+
+        .function-card p {
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* Footer */
+        .footer {
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white */
+            text-align: center;
+            margin-top: auto;
+        }
+
+        .footer a {
+            color: #4CAF50; /* Green color for farm theme */
+            text-decoration: none;
+            margin: 0 5px;
+            font-size: 12px;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Media Queries for Responsive Design */
+        @media (min-width: 600px) {
+            /* Adjustments for tablets and larger screens */
+            .menu button {
+                flex: 1 1 calc(25% - 20px); /* Four buttons per row */
+                font-size: 16px;
+            }
+
+            .function-card {
+                flex: 1 1 calc(25% - 20px); /* Four cards per row */
+            }
+
+            .header {
+                padding: 20px;
+            }
+
+            .info-chart {
+                padding: 20px;
+                margin: 20px;
+            }
+
+            .menu {
+                padding: 20px;
+                margin: 0 20px;
+            }
+
+            .functions {
+                padding: 20px;
+                gap: 20px;
+            }
+
+            .footer {
+                padding: 20px;
+            }
+        }
+
+        @media (min-width: 900px) {
+            /* Adjustments for desktops */
+            .menu button {
+                flex: 1 1 calc(20% - 20px); /* Five buttons per row */
+            }
+
+            .function-card {
+                flex: 1 1 calc(20% - 20px); /* Five cards per row */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Header -->
+        <div class="header">
+            <h1>Farming App Dashboard</h1>
+            <div class="user-profile">
+                <img src="user-profile.jpg" alt="User Profile"> <!-- Add your user profile image -->
+                <span>John Doe</span>
+            </div>
+        </div>
+
+        <!-- Information Chart -->
+        <div class="info-chart">
+            <h2>Monthly Crop Yield</h2>
+            <p>Here is a chart showing the monthly crop yield for your farm.</p>
+            <!-- Add your chart here (e.g., using Chart.js or any other library) -->
+        </div>
+
+        <!-- Menu -->
+        <div class="menu">
+            <button>Weather</button>
+            <button>Crops</button>
+            <button>Livestock</button>
+            <button>Market Prices</button>
+            <button onclick="logout()">Logout</button>
+        </div>
+
+        <!-- Function Templates -->
+        <div class="functions">
+            <div class="function-card">
+                <h3>Weather</h3>
+                <p>Check the latest weather updates for your farm.</p>
+            </div>
+            <div class="function-card">
+                <h3>Crops</h3>
+                <p>Manage and monitor your crops.</p>
+            </div>
+            <div class="function-card">
+                <h3>Livestock</h3>
+                <p>Track the health and status of your livestock.</p>
+            </div>
+            <div class="function-card">
+                <h3>Market Prices</h3>
+                <p>View the latest market prices for your produce.</p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <a href="#">About</a>
+            <a href="#">Contact</a>
+            <a href="#">Privacy Policy</a>
+        </div>
+    </div>
+
+    <script>
+fetch("http://localhost:8085/protected", { credentials: "include" })
+  .then(response => response.json())
+  .then(data => {
+      if (!data.success) {
+          window.location.href = "/login.html"; // Redirect to login if not authenticated
+      }
+  });
+</script>
+</body>
+</html>
