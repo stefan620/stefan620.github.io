@@ -250,62 +250,15 @@
             <a href="#">Privacy Policy</a>
         </div>
     </div>
-<script>
-    // Function to get a cookie value by name
-    function getCookie(name) {
-        const cookies = document.cookie.split("; ");
-        for (let cookie of cookies) {
-            let [key, value] = cookie.split("=");
-            if (key === name) {
-                return decodeURIComponent(value);
-            }
-        }
-        return null;
-    }
-    
-    // Function to decode a JWT
-    function decodeJWT(token) {
-        try {
-            const base64Url = token.split(".")[1]; // Get payload (second part)
-            const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-            return JSON.parse(atob(base64)); // Decode and parse JSON
-        } catch (e) {
-            console.error("Invalid JWT format", e);
-            return null;
-        }
-    }
-    
-    // Function to validate JWT
-    function validateJWT() {
-        const token = getCookie("token");
-        if (!token) {
-            console.warn("No token found");
-            return false;
-        }
-    
-        const claims = decodeJWT(token);
-        if (!claims) {
-            console.warn("Invalid token");
-            return false;
-        }
-    
-        // Check expiration (exp claim)
-        const currentTime = Math.floor(Date.now() / 1000);
-        if (claims.exp && claims.exp < currentTime) {
-            console.warn("Token expired");
-            return false;
-        }
-    
-        console.log("Token is valid", claims);
-        return true;
-    }
-    
-    // Usage example
-    if (validateJWT()) {
-        console.log("User is authenticated");
-    } else {
-        console.log("User is not authenticated");
-    }
-</script></currentTime>    
+
+    <script>
+fetch("https://farmapi-1.onrender.com/protected", { credentials: "include" })
+  .then(response => response.json())
+  .then(data => {
+      if (!data.success) {
+          window.location.href = "/index.html"; // Redirect to login if not authenticated
+      }
+  });
+</script>
 </body>
 </html>
