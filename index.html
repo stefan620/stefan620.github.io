@@ -128,7 +128,7 @@
             const password = document.getElementById('password1').value; 
             const farm_name = document.getElementById('farmName').value;
         
-            fetch("https://farmapi-ox2q.onrender.com/register", {
+            fetch("https://farmapi-1.onrender.com/register", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({first_name : first_name, last_name : last_name, email : email, password : password, farm_name : farm_name})
@@ -154,7 +154,7 @@
             const email = document.getElementById("username").value;
             const password = document.getElementById("password").value;
 
-            fetch("https://farmapi-ox2q.onrender.com/login", {
+            fetch("https://farmapi-1.onrender.com/login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({email : email, password : password}),
