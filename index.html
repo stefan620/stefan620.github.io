@@ -142,6 +142,8 @@
                 document.getElementById("password1").value = "";
                 document.getElementById("farmName").value = ""; // Clear input field
             })
+            .then(text => { console.log(text); return JSON.parse(text); }) // Then parse
+            .then(data => console.log(data))
             .catch(error => {
                 console.error("Error:", error);
                 document.getElementById("message").textContent = "Failed to insert record.";
