@@ -252,7 +252,11 @@
     </div>
 
     <script>
-fetch("https://farmapi-gcfl.onrender.com/userValidation", { credentials: "include" })
+fetch("https://farmapi-gcfl.onrender.com/userValidation", {  
+method: "POST",
+headers: { "Content-Type": "application/json" },
+credentials: "include" 
+})
   .then(response => response.json())
   .then(data => {
       if (!data.success) {
