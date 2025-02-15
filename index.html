@@ -128,7 +128,7 @@
             const password = document.getElementById('password1').value; 
             const farm_name = document.getElementById('farmName').value;
         
-            fetch("https://farmapi-gcfl.onrender.com/register", {
+            fetch("https://farmapi-gcfl.onrender.com/registration", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({first_name : first_name, last_name : last_name, email : email, password : password, farm_name : farm_name})
