@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Wine Cellar — Control & Telemetry</title>
+  <title>Wine Cellar — Control</title>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <meta name="color-scheme" content="dark">
@@ -45,7 +45,7 @@
     .kpi{font-size:40px;font-weight:800;line-height:1;margin:6px 0}
     .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 
-    button, input[type="number"], input[type="range"], select{
+    button, input[type="number"], input[type="range"]{
       border:1px solid rgba(255,255,255,.14);background:#0b142b;color:var(--text);
       padding:10px 14px;border-radius:12px;font-size:14px;outline:none;transition:box-shadow .15s,border-color .2s,transform .05s
     }
@@ -55,7 +55,6 @@
     .btn-ghost{background:transparent}
 
     .kpi-card{grid-column:span 3;min-height:120px}
-    .wide-card{grid-column:span 12}
     .half-card{grid-column:span 6}
 
     .meter{height:10px;width:100%;background:#0a1022;border-radius:999px;overflow:hidden;border:1px solid rgba(255,255,255,.08)}
@@ -63,14 +62,14 @@
 
     .footer{opacity:.7;font-size:12px;margin-top:auto}
 
-    @media (max-width:1100px){.kpi-card{grid-column:span 6}.half-card,.wide-card{grid-column:span 12}}
+    @media (max-width:1100px){.kpi-card{grid-column:span 6}.half-card{grid-column:span 12}}
   </style>
 </head>
 <body>
   <header>
     <div class="brand">
       <div class="title">Wine Cellar Dashboard</div>
-      <div class="subtitle">Real‑time control & history — via Cloudflare Worker</div>
+      <div class="subtitle">Real‑time control — via Cloudflare Worker</div>
     </div>
     <div class="statusbar">
       <span class="tag" id="conn">Connecting…</span>
@@ -112,22 +111,6 @@
       <div class="row"><span class="tag" id="raw">—</span></div>
     </div>
 
-    <div class="card wide-card">
-      <h3>Temperature — last <span id="rangeLabel">24h</span></h3>
-      <div class="row" style="margin-bottom:8px">
-        <select id="range">
-          <option value="6">6 hours</option>
-          <option value="12">12 hours</option>
-          <option value="24" selected>24 hours</option>
-          <option value="48">48 hours</option>
-          <option value="72">72 hours</option>
-          <option value="168">7 days</option>
-        </select>
-        <button class="btn-ghost" id="refresh">Refresh</button>
-      </div>
-      <canvas id="chart" height="320"></canvas>
-    </div>
-
     <div class="card half-card">
       <h3>Quick Presets</h3>
       <div class="row">
@@ -148,7 +131,6 @@
 
   <div class="footer">© <span id="yr"></span> Wine Cellar · Frontend connected to Cloudflare Worker</div>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script>
     // === CONFIG: point to your Worker URL ===
     const API = 'https://red-sky-882d.silic700.workers.dev';
@@ -160,8 +142,6 @@
 
     const spNum = $('spnum'), spSlider = $('spslider');
     const btnApply = $('apply'), btnOn = $('on'), btnOff = $('off');
-
-    let chart;
 
     function fmtUptime(s){ if(!Number.isFinite(+s)) return '—'; const d=Math.floor(s/86400),h=Math.floor((s%86400)/3600),m=Math.floor((s%3600)/60); return `${d}d ${h}h ${m}m`; }
 
@@ -197,24 +177,6 @@
       }catch(e){ console.error(e); elConn.textContent = 'Error'; }
     }
 
-    async function loadHistory(hours){
-      const r = await timedFetch(`${API}/api/history?hours=${hours}`);
-      if(!r.ok) throw new Error('history '+r.status);
-      const arr = await r.json();
-      const pts = arr.map(d=>({ t:new Date(d.created_at), v:(safeJSON(d.value)||{}).temp })).filter(p=>Number.isFinite(p.v));
-      return pts;
-    }
-
-    async function drawChart(hours){
-      $('rangeLabel').textContent = hours+'h';
-      const pts = await loadHistory(hours);
-      const labels = pts.map(p=> p.t.toLocaleString());
-      const data = pts.map(p=> p.v);
-      const ctx = $('chart');
-      if(chart) chart.destroy();
-      chart = new Chart(ctx, { type:'line', data:{ labels, datasets:[{ label:'Temperature (°C)', data, cubicInterpolationMode:'monotone', tension:.25 }]}, options:{ responsive:true, maintainAspectRatio:false, scales:{ y:{ beginAtZero:false }}}});
-    }
-
     // Controls
     btnApply.addEventListener('click', async ()=>{
       const v = parseFloat(spNum.value);
@@ -236,15 +198,10 @@
       });
     });
 
-    // Range + refresh
-    $('range').addEventListener('change', e=> drawChart(parseInt(e.target.value,10)));
-    $('refresh').addEventListener('click', ()=> drawChart(parseInt($('range').value,10)));
-
     // Kickoff + intervals
     $('yr').textContent = new Date().getFullYear();
-    (async()=>{ await loadStatus(); await drawChart(24); })();
+    (async()=>{ await loadStatus(); })();
     setInterval(loadStatus, 10_000);
-    setInterval(()=> drawChart(parseInt($('range').value,10)), 60_000);
   </script>
 </body>
 </html>
