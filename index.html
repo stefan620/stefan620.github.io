@@ -154,8 +154,19 @@
         elConn.textContent = 'Fetching…';
         const r = await timedFetch(`${API}/api/status`);
         if(!r.ok) throw new Error('status '+r.status);
-        const latest = await r.json();
-        const j = safeJSON(latest.value)||{};
+        let payload = await r.json();
+        // Worker returns the raw AIO array; normalize to the first element
+        const latest = Array.isArray(payload) ? (payload[0] || null) : payload;
+        if(!latest){ elConn.textContent='No data'; return; }
+
+        // latest.value should be a JSON string; parse defensively
+        const rawVal = latest.value;
+        let j = null;
+        if (rawVal && typeof rawVal === 'string' && rawVal.trim().startsWith('{')) {
+          try { j = JSON.parse(rawVal); } catch { j = null; }
+        }
+        if (!j || typeof j !== 'object') j = {};
+
         const t = j.temp, sp = j.setpoint, ac = j.acIsOn, up = j.uptime_s;
 
         elTemp.textContent = (t==null? '--.-' : (+t).toFixed(1)) + ' °C';
@@ -164,8 +175,9 @@
         elAC.textContent = ac? 'ON' : 'OFF';
         elAC.style.color = ac? 'var(--good)' : 'var(--muted)';
         elUp.textContent = fmtUptime(+up||0);
-        elUpd.textContent = new Date(latest.created_at).toLocaleString();
-        const raw = latest.value||''; elRaw.textContent = raw.length>60? raw.slice(0,60)+'…' : raw;
+        elUpd.textContent = latest.created_at ? new Date(latest.created_at).toLocaleString() : '—';
+        const raw = rawVal || '';
+        elRaw.textContent = raw.length>60? raw.slice(0,60)+'…' : (raw || '—');
 
         // temp bar (0–25 °C)
         if(Number.isFinite(+t)){
