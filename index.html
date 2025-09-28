@@ -76,6 +76,13 @@
       <span class="tag" id="updated">—</span>
       <span class="tag" id="latency">— ms</span>
     </div>
+    <div class="statusbar" id="authbar" style="gap:8px; display:none">
+      <input id="lu" placeholder="user" style="width:120px"/>
+      <input id="lp" placeholder="password" type="password" style="width:140px"/>
+      <button class="btn-primary" id="lin">Login</button>
+      <button class="btn-ghost" id="lout" style="display:none">Logout</button>
+      <span class="tag" id="la"></span>
+    </div>
   </header>
 
   <section class="grid">
@@ -143,11 +150,28 @@
     const spNum = $('spnum'), spSlider = $('spslider');
     const btnApply = $('apply'), btnOn = $('on'), btnOff = $('off');
 
+    // Auth UI
+    const barAuth = $('authbar');
+    const inUser = $('lu');
+    const inPass = $('lp');
+    const btnIn  = $('lin');
+    const btnOut = $('lout');
+    const lblAuth= $('la');
+
+    let authed = false; // toggled after login/logout
+
     function fmtUptime(s){ if(!Number.isFinite(+s)) return '—'; const d=Math.floor(s/86400),h=Math.floor((s%86400)/3600),m=Math.floor((s%3600)/60); return `${d}d ${h}h ${m}m`; }
 
     function safeJSON(str){ try{ return JSON.parse(str); } catch{ return null; } }
 
-    async function timedFetch(url, init){ const t0 = performance.now(); const r = await fetch(url, init); const t1 = performance.now(); elLat.textContent = `${Math.round(t1-t0)} ms`; return r; }
+    async function timedFetch(url, init={}){
+      const t0 = performance.now();
+      // always include credentials so cookies (sid) are sent
+      const r = await fetch(url, { credentials:'include', ...init });
+      const t1 = performance.now();
+      elLat.textContent = `${Math.round(t1-t0)} ms`;
+      return r;
+    }
 
     async function loadStatus(){
       try{
@@ -190,22 +214,44 @@
     }
 
     // Controls
+    function setControlsEnabled(on){ [btnApply, btnOn, btnOff, spNum, spSlider].forEach(el=>{ el.disabled = !on; }); }
+    setControlsEnabled(false); // disabled until we know login state or worker allows anon
+
+    async function login(u,p){
+      const r = await timedFetch(`${API}/auth/login`, {
+        method:'POST', headers:{'content-type':'application/json'},
+        body: JSON.stringify({ user:u, pass:p })
+      });
+      if(r.ok){ authed = true; lblAuth.textContent = 'Logged in'; btnOut.style.display='inline-block'; barAuth.style.display='none'; setControlsEnabled(true); }
+      else { authed = false; lblAuth.textContent = 'Login failed'; barAuth.style.display='flex'; setControlsEnabled(false); }
+      return r.ok;
+    }
+    async function logout(){
+      await timedFetch(`${API}/auth/logout`, { method:'POST' });
+      authed = false; lblAuth.textContent = 'Logged out'; btnOut.style.display='none'; barAuth.style.display='flex'; setControlsEnabled(false);
+    }
+
+    btnIn.addEventListener('click', async ()=>{ await login(inUser.value, inPass.value); });
+    btnOut.addEventListener('click', async ()=>{ await logout(); });
+
     btnApply.addEventListener('click', async ()=>{
       const v = parseFloat(spNum.value);
       if(!Number.isFinite(v) || v<6 || v>20){ alert('Setpoint must be 6–20 °C'); return; }
-      await fetch(`${API}/api/setpoint`, { method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify({ c:v }) });
+      const r = await timedFetch(`${API}/api/setpoint`, { method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify({ c:v }) });
+      if(r.status === 401){ barAuth.style.display='flex'; setControlsEnabled(false); return; }
       await loadStatus();
     });
     spSlider.addEventListener('input', e=>{ spNum.value=(+e.target.value).toFixed(1); });
-    btnOn.addEventListener('click', async()=>{ await fetch(`${API}/api/cmd`, { method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify({ value:'on' })}); await loadStatus(); });
-    btnOff.addEventListener('click', async()=>{ await fetch(`${API}/api/cmd`, { method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify({ value:'off' })}); await loadStatus(); });
+    btnOn.addEventListener('click', async()=>{ const r = await timedFetch(`${API}/api/cmd`, { method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify({ value:'on' })}); if(r.status===401){ barAuth.style.display='flex'; setControlsEnabled(false); return;} await loadStatus(); });
+    btnOff.addEventListener('click', async()=>{ const r = await timedFetch(`${API}/api/cmd`, { method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify({ value:'off' })}); if(r.status===401){ barAuth.style.display='flex'; setControlsEnabled(false); return;} await loadStatus(); });
 
     // Presets
     document.querySelectorAll('[data-sp]').forEach(b=>{
       b.addEventListener('click', async ()=>{
         const v = parseFloat(b.getAttribute('data-sp'));
         spNum.value = v.toFixed(1); spSlider.value = v;
-        await fetch(`${API}/api/setpoint`, { method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify({ c:v }) });
+        const r = await timedFetch(`${API}/api/setpoint`, { method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify({ c:v }) });
+        if(r.status===401){ barAuth.style.display='flex'; setControlsEnabled(false); return; }
         await loadStatus();
       });
     });
@@ -214,6 +260,13 @@
     $('yr').textContent = new Date().getFullYear();
     (async()=>{ await loadStatus(); })();
     setInterval(loadStatus, 10_000);
+
+    // Silent auth probe: try a protected endpoint; if 401 show login bar
+    (async()=>{
+      const r = await timedFetch(`${API}/api/cmd`, { method:'POST', headers:{'content-type':'application/json'}, body: JSON.stringify({ value:'noop' }) });
+      if(r.status===401){ barAuth.style.display='flex'; setControlsEnabled(false); }
+      else { authed = true; barAuth.style.display='none'; btnOut.style.display='inline-block'; setControlsEnabled(true); }
+    })();
   </script>
 </body>
 </html>
