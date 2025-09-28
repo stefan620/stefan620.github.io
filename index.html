@@ -1,183 +1,250 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login and Register</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background-image: url('landing.jpg'); /* Add your background image path here */
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: Arial, sans-serif;
-        }
-        .form-container {
-            max-width: 400px;
-            width: 100%;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.9); /* Semi-transparent white background */
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-        }
-        .form-container h2 {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .form-control {
-            border-radius: 5px;
-        }
-        .btn-primary {
-            width: 100%;
-            background-color: #007bff;
-            border: none;
-            border-radius: 5px;
-            padding: 10px;
-            font-size: 16px;
-        }
-        .btn-primary:hover {
-            background-color: #0056b3;
-        }
-        .toggle-form {
-            text-align: center;
-            margin-top: 15px;
-        }
-        .toggle-form a {
-            color: #007bff;
-            text-decoration: none;
-        }
-        .toggle-form a:hover {
-            text-decoration: underline;
-        }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Wine Cellar — Control & Telemetry</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <meta name="color-scheme" content="dark">
+  <style>
+    :root {
+      --bg: #070a14;
+      --bg2:#0b1224;
+      --panel:#0f1933;
+      --panel2:#0b142b;
+      --text:#f2f5ff;
+      --muted:#a7b0c7;
+      --accent:#6aa9ff;
+      --good:#35d49a;
+      --warn:#ffb86b;
+      --bad:#ff6b6b;
+      --ring: rgba(106,169,255,.45);
+      --glow: 0 12px 40px rgba(0,0,0,.45);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;background:radial-gradient(1200px 700px at 20% -10%, #26315b 0%, transparent 55%),
+                       radial-gradient(900px 500px at 100% 0%, #1b2547 0%, transparent 60%),
+                       linear-gradient(160deg, var(--bg) 0%, var(--bg) 100%);
+         color:var(--text);font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+         display:flex;flex-direction:column;gap:20px;padding:22px}
+    header{display:flex;justify-content:space-between;align-items:center;gap:16px}
+    .brand{display:flex;flex-direction:column}
+    .title{font-weight:800;font-size:22px;letter-spacing:.2px}
+    .subtitle{color:var(--muted);font-size:13px}
+    .statusbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .tag{border:1px solid rgba(255,255,255,.12);background:linear-gradient(180deg,var(--panel) 0%,var(--panel2) 100%);
+         padding:6px 10px;border-radius:999px;color:var(--muted);font-size:12px}
+
+    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}
+    .card{background:linear-gradient(180deg,var(--panel) 0%,var(--panel2) 100%);
+          border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:16px 18px;box-shadow:var(--glow)}
+    .card h3{margin:0 0 8px;font-size:13px;color:var(--muted);font-weight:700;letter-spacing:.3px}
+
+    .kpi{font-size:40px;font-weight:800;line-height:1;margin:6px 0}
+    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+
+    button, input[type="number"], input[type="range"], select{
+      border:1px solid rgba(255,255,255,.14);background:#0b142b;color:var(--text);
+      padding:10px 14px;border-radius:12px;font-size:14px;outline:none;transition:box-shadow .15s,border-color .2s,transform .05s
+    }
+    button:hover{transform:translateY(-1px);border-color:var(--accent);box-shadow:0 0 0 3px var(--ring);cursor:pointer}
+    .btn-primary{background:linear-gradient(180deg,#2a417a,#1b2d58);border-color:rgba(106,169,255,.35)}
+    .btn-danger{background:linear-gradient(180deg,#7a2a2a,#5a2121);border-color:rgba(255,107,107,.35)}
+    .btn-ghost{background:transparent}
+
+    .kpi-card{grid-column:span 3;min-height:120px}
+    .wide-card{grid-column:span 12}
+    .half-card{grid-column:span 6}
+
+    .meter{height:10px;width:100%;background:#0a1022;border-radius:999px;overflow:hidden;border:1px solid rgba(255,255,255,.08)}
+    .meter>i{display:block;height:100%;width:0%;background:linear-gradient(90deg,#3e74ff,#7cb8ff)}
+
+    .footer{opacity:.7;font-size:12px;margin-top:auto}
+
+    @media (max-width:1100px){.kpi-card{grid-column:span 6}.half-card,.wide-card{grid-column:span 12}}
+  </style>
 </head>
 <body>
-    <div class="form-container" id="loginForm">
-        <h2>Login</h2>
-        <form method="POST">
-            <div class="mb-3">
-                <label for="username" class="form-label">Username</label>
-                <input type="text" class="form-control" id="username" name="username" required>
-            </div>
-            <div class="mb-3">
-                <label for="password" class="form-label">Password</label>
-                <input type="password" class="form-control" id="password" name="password" required>
-            </div>
-            <button type="submit" class="btn btn-primary">Login</button>
-        </form>
-        <div class="toggle-form">
-            <p>Don't have an account? <a href="#" onclick="toggleForm('registerForm')">Register here</a></p>
-            <p id="message"></p>
-        </div>
+  <header>
+    <div class="brand">
+      <div class="title">Wine Cellar Dashboard</div>
+      <div class="subtitle">Real‑time control & history — via Cloudflare Worker</div>
+    </div>
+    <div class="statusbar">
+      <span class="tag" id="conn">Connecting…</span>
+      <span class="tag" id="updated">—</span>
+      <span class="tag" id="latency">— ms</span>
+    </div>
+  </header>
+
+  <section class="grid">
+    <div class="card kpi-card">
+      <h3>Temperature</h3>
+      <div class="kpi" id="temp">--.- °C</div>
+      <div class="meter"><i id="tempbar"></i></div>
+      <div class="row"><span class="tag" id="tempstate">—</span></div>
     </div>
 
-    <div class="form-container" id="registerForm" style ="display:none;">
-        <h2>Register</h2>
-        <form method="POST">
-            <div class="mb-3">
-                <label for="firstName" class="form-label">First Name</label>
-                <input type="text" class="form-control" id="firstName" name="firstName" required>
-            </div>
-            <div class="mb-3">
-                <label for="lastName" class="form-label">Last Name</label>
-                <input type="text" class="form-control" id="lastName" name="lastName" required>
-            </div>
-            <div class="mb-3">
-                <label for="email" class="form-label">Email</label>
-                <input type="email" class="form-control" id="email" name="email" required>
-            </div>
-            <div class="mb-3">
-                <label for="password" class="form-label">Password</label>
-                <input type="password" class="form-control" id="password1" name="password" required>
-            </div>
-            <div class="mb-3">
-                <label for="farmName" class="form-label">Farm Name (Optional)</label>
-                <input type="text" class="form-control" id="farmName" name="farmName">
-            </div>
-            <button type="submit" class="btn btn-primary">Register</button>
-        </form>
-        <div class="toggle-form">
-            <p>Already have an account? <a href="#" onclick="toggleForm('loginForm')">Login here</a></p>
-            <p id="message"></p>
-        </div>
+    <div class="card kpi-card">
+      <h3>Setpoint</h3>
+      <div class="kpi" id="setpt">--.- °C</div>
+      <div class="row">
+        <input id="spnum" type="number" step="0.1" min="6" max="20" style="width:110px" />
+        <input id="spslider" type="range" step="0.1" min="6" max="20" style="width:180px" />
+        <button class="btn-primary" id="apply">Apply</button>
+      </div>
     </div>
 
-    <!-- Bootstrap JS (Optional) -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        function toggleForm(formId) {
-            document.getElementById('loginForm').style.display = formId === 'loginForm' ? 'block' : 'none';
-            document.getElementById('registerForm').style.display = formId === 'registerForm' ? 'block' : 'none';
+    <div class="card kpi-card">
+      <h3>AC State</h3>
+      <div class="kpi" id="ac">—</div>
+      <div class="row">
+        <button class="btn-primary" id="on">Turn ON</button>
+        <button class="btn-danger" id="off">Turn OFF</button>
+      </div>
+    </div>
+
+    <div class="card kpi-card">
+      <h3>Uptime</h3>
+      <div class="kpi" id="uptime">—</div>
+      <div class="row"><span class="tag" id="raw">—</span></div>
+    </div>
+
+    <div class="card wide-card">
+      <h3>Temperature — last <span id="rangeLabel">24h</span></h3>
+      <div class="row" style="margin-bottom:8px">
+        <select id="range">
+          <option value="6">6 hours</option>
+          <option value="12">12 hours</option>
+          <option value="24" selected>24 hours</option>
+          <option value="48">48 hours</option>
+          <option value="72">72 hours</option>
+          <option value="168">7 days</option>
+        </select>
+        <button class="btn-ghost" id="refresh">Refresh</button>
+      </div>
+      <canvas id="chart" height="320"></canvas>
+    </div>
+
+    <div class="card half-card">
+      <h3>Quick Presets</h3>
+      <div class="row">
+        <button class="btn-ghost" data-sp="12">12 °C</button>
+        <button class="btn-ghost" data-sp="12.5">12.5 °C</button>
+        <button class="btn-ghost" data-sp="13">13 °C</button>
+        <button class="btn-ghost" data-sp="14">14 °C</button>
+        <button class="btn-ghost" data-sp="15">15 °C</button>
+      </div>
+    </div>
+
+    <div class="card half-card">
+      <h3>Notes</h3>
+      <div class="subtitle">Reads from <code>wine.status</code> and writes to <code>wine.cmd</code> via your Cloudflare Worker.
+      Keep your Adafruit IO key server‑side in Worker variables.</div>
+    </div>
+  </section>
+
+  <div class="footer">© <span id="yr"></span> Wine Cellar · Frontend connected to Cloudflare Worker</div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script>
+    // === CONFIG: point to your Worker URL ===
+    const API = 'https://red-sky-882d.silic700.workers.dev';
+
+    const $ = (id) => document.getElementById(id);
+    const elTemp = $('temp'), elSet = $('setpt'), elAC = $('ac'), elUp = $('uptime');
+    const elConn = $('conn'), elUpd = $('updated'), elLat = $('latency'), elState=$('tempstate'), elRaw=$('raw');
+    const elBar = $('tempbar');
+
+    const spNum = $('spnum'), spSlider = $('spslider');
+    const btnApply = $('apply'), btnOn = $('on'), btnOff = $('off');
+
+    let chart;
+
+    function fmtUptime(s){ if(!Number.isFinite(+s)) return '—'; const d=Math.floor(s/86400),h=Math.floor((s%86400)/3600),m=Math.floor((s%3600)/60); return `${d}d ${h}h ${m}m`; }
+
+    function safeJSON(str){ try{ return JSON.parse(str); } catch{ return null; } }
+
+    async function timedFetch(url, init){ const t0 = performance.now(); const r = await fetch(url, init); const t1 = performance.now(); elLat.textContent = `${Math.round(t1-t0)} ms`; return r; }
+
+    async function loadStatus(){
+      try{
+        elConn.textContent = 'Fetching…';
+        const r = await timedFetch(`${API}/api/status`);
+        if(!r.ok) throw new Error('status '+r.status);
+        const latest = await r.json();
+        const j = safeJSON(latest.value)||{};
+        const t = j.temp, sp = j.setpoint, ac = j.acIsOn, up = j.uptime_s;
+
+        elTemp.textContent = (t==null? '--.-' : (+t).toFixed(1)) + ' °C';
+        elSet.textContent = (sp==null? '--.-' : (+sp).toFixed(1)) + ' °C';
+        if(sp!=null){ spNum.value=(+sp).toFixed(1); spSlider.value=+sp; }
+        elAC.textContent = ac? 'ON' : 'OFF';
+        elAC.style.color = ac? 'var(--good)' : 'var(--muted)';
+        elUp.textContent = fmtUptime(+up||0);
+        elUpd.textContent = new Date(latest.created_at).toLocaleString();
+        const raw = latest.value||''; elRaw.textContent = raw.length>60? raw.slice(0,60)+'…' : raw;
+
+        // temp bar (0–25 °C)
+        if(Number.isFinite(+t)){
+          const pct = Math.max(0, Math.min(100, (t/25)*100));
+          elBar.style.width = pct+'%';
         }
-            document.getElementById("registerForm").addEventListener("submit", function(event) {
-            event.preventDefault(); // Prevent default form submission
-            
-            const saltRounds = 10; // Number of hashing rounds
+        if(t!=null && sp!=null){ elState.textContent = (+t)>(+sp)? 'Above setpoint' : 'At/Below setpoint'; }
+        elConn.textContent = 'OK';
+      }catch(e){ console.error(e); elConn.textContent = 'Error'; }
+    }
 
-            const first_name = document.getElementById('firstName').value;
-            const last_name = document.getElementById('lastName').value;
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password1').value; 
-            const farm_name = document.getElementById('farmName').value;
-        
-            fetch("https://farmapi-gcfl.onrender.com/registration", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({first_name : first_name, last_name : last_name, email : email, password : password, farm_name : farm_name})
-            })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById("message").textContent = data.message;
-                document.getElementById("firstName").value = "";
-                document.getElementById("lastName").value = "";
-                document.getElementById("email").value = "";
-                document.getElementById("password1").value = "";
-                document.getElementById("farmName").value = ""; // Clear input field
-            })
-            .then(text => { console.log(text); return JSON.parse(text); }) // Then parse
-            .then(data => console.log(data))
-            .catch(error => {
-                console.error("Error:", error);
-                document.getElementById("message").textContent = "Failed to insert record.";
-            });
-        });
+    async function loadHistory(hours){
+      const r = await timedFetch(`${API}/api/history?hours=${hours}`);
+      if(!r.ok) throw new Error('history '+r.status);
+      const arr = await r.json();
+      const pts = arr.map(d=>({ t:new Date(d.created_at), v:(safeJSON(d.value)||{}).temp })).filter(p=>Number.isFinite(p.v));
+      return pts;
+    }
 
-        document.getElementById("loginForm").addEventListener("submit", function(event) {
-            event.preventDefault(); // Prevent default form submission
-            
-            const email = document.getElementById("username").value;
-            const password = document.getElementById("password").value;
+    async function drawChart(hours){
+      $('rangeLabel').textContent = hours+'h';
+      const pts = await loadHistory(hours);
+      const labels = pts.map(p=> p.t.toLocaleString());
+      const data = pts.map(p=> p.v);
+      const ctx = $('chart');
+      if(chart) chart.destroy();
+      chart = new Chart(ctx, { type:'line', data:{ labels, datasets:[{ label:'Temperature (°C)', data, cubicInterpolationMode:'monotone', tension:.25 }]}, options:{ responsive:true, maintainAspectRatio:false, scales:{ y:{ beginAtZero:false }}}});
+    }
 
-            fetch("https://farmapi-gcfl.onrender.com/login", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({email : email, password : password}),
-                credentials: "include"
-            })
-            .then(response => response.json())
-            .then (data => {
-                if (data.success) {
-                    document.getElementById("message").textContent = "login sec";
-                    window.location.href = 'dashboard.html';
-                }
-                else {
-                    document.getElementById("message").textContent = "login not sec";
-                    document.getElementById("username").value = "";
-                    document.getElementById("password").value = "";
-                }
-              
-            })
+    // Controls
+    btnApply.addEventListener('click', async ()=>{
+      const v = parseFloat(spNum.value);
+      if(!Number.isFinite(v) || v<6 || v>20){ alert('Setpoint must be 6–20 °C'); return; }
+      await fetch(`${API}/api/setpoint`, { method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify({ c:v }) });
+      await loadStatus();
+    });
+    spSlider.addEventListener('input', e=>{ spNum.value=(+e.target.value).toFixed(1); });
+    btnOn.addEventListener('click', async()=>{ await fetch(`${API}/api/cmd`, { method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify({ value:'on' })}); await loadStatus(); });
+    btnOff.addEventListener('click', async()=>{ await fetch(`${API}/api/cmd`, { method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify({ value:'off' })}); await loadStatus(); });
 
-        });
+    // Presets
+    document.querySelectorAll('[data-sp]').forEach(b=>{
+      b.addEventListener('click', async ()=>{
+        const v = parseFloat(b.getAttribute('data-sp'));
+        spNum.value = v.toFixed(1); spSlider.value = v;
+        await fetch(`${API}/api/setpoint`, { method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify({ c:v }) });
+        await loadStatus();
+      });
+    });
 
-    </script>
+    // Range + refresh
+    $('range').addEventListener('change', e=> drawChart(parseInt(e.target.value,10)));
+    $('refresh').addEventListener('click', ()=> drawChart(parseInt($('range').value,10)));
+
+    // Kickoff + intervals
+    $('yr').textContent = new Date().getFullYear();
+    (async()=>{ await loadStatus(); await drawChart(24); })();
+    setInterval(loadStatus, 10_000);
+    setInterval(()=> drawChart(parseInt($('range').value,10)), 60_000);
+  </script>
 </body>
 </html>
