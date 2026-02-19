@@ -1,272 +1,97 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Wine Cellar — Control</title>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-  <meta name="color-scheme" content="dark">
-  <style>
-    :root {
-      --bg: #070a14;
-      --bg2:#0b1224;
-      --panel:#0f1933;
-      --panel2:#0b142b;
-      --text:#f2f5ff;
-      --muted:#a7b0c7;
-      --accent:#6aa9ff;
-      --good:#35d49a;
-      --warn:#ffb86b;
-      --bad:#ff6b6b;
-      --ring: rgba(106,169,255,.45);
-      --glow: 0 12px 40px rgba(0,0,0,.45);
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{margin:0;background:radial-gradient(1200px 700px at 20% -10%, #26315b 0%, transparent 55%),
-                       radial-gradient(900px 500px at 100% 0%, #1b2547 0%, transparent 60%),
-                       linear-gradient(160deg, var(--bg) 0%, var(--bg) 100%);
-         color:var(--text);font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
-         display:flex;flex-direction:column;gap:20px;padding:22px}
-    header{display:flex;justify-content:space-between;align-items:center;gap:16px}
-    .brand{display:flex;flex-direction:column}
-    .title{font-weight:800;font-size:22px;letter-spacing:.2px}
-    .subtitle{color:var(--muted);font-size:13px}
-    .statusbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-    .tag{border:1px solid rgba(255,255,255,.12);background:linear-gradient(180deg,var(--panel) 0%,var(--panel2) 100%);
-         padding:6px 10px;border-radius:999px;color:var(--muted);font-size:12px}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}
-    .card{background:linear-gradient(180deg,var(--panel) 0%,var(--panel2) 100%);
-          border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:16px 18px;box-shadow:var(--glow)}
-    .card h3{margin:0 0 8px;font-size:13px;color:var(--muted);font-weight:700;letter-spacing:.3px}
+<title>Bootstrap Playground</title>
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- Your CSS -->
+<link rel="stylesheet" href="css/style.css">
 
-    .kpi{font-size:40px;font-weight:800;line-height:1;margin:6px 0}
-    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+<!-- Navigation and Logo -->
+ <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container">
 
-    button, input[type="number"], input[type="range"]{
-      border:1px solid rgba(255,255,255,.14);background:#0b142b;color:var(--text);
-      padding:10px 14px;border-radius:12px;font-size:14px;outline:none;transition:box-shadow .15s,border-color .2s,transform .05s
-    }
-    button:hover{transform:translateY(-1px);border-color:var(--accent);box-shadow:0 0 0 3px var(--ring);cursor:pointer}
-    .btn-primary{background:linear-gradient(180deg,#2a417a,#1b2d58);border-color:rgba(106,169,255,.35)}
-    .btn-danger{background:linear-gradient(180deg,#7a2a2a,#5a2121);border-color:rgba(255,107,107,.35)}
-    .btn-ghost{background:transparent}
+    <!-- Brand -->
+    <a class="navbar-brand" href="#">MySite</a>
 
-    .kpi-card{grid-column:span 3;min-height:120px}
-    .half-card{grid-column:span 6}
+    <!-- Mobile toggle -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
 
-    .meter{height:10px;width:100%;background:#0a1022;border-radius:999px;overflow:hidden;border:1px solid rgba(255,255,255,.08)}
-    .meter>i{display:block;height:100%;width:0%;background:linear-gradient(90deg,#3e74ff,#7cb8ff)}
+    <!-- Links -->
+    <div class="collapse navbar-collapse" id="mainNav">
+      <ul class="navbar-nav ms-auto">
 
-    .footer{opacity:.7;font-size:12px;margin-top:auto}
+        <li class="nav-item">
+          <a class="nav-link active" href="#">Home</a>
+        </li>
 
-    @media (max-width:1100px){.kpi-card{grid-column:span 6}.half-card{grid-column:span 12}}
-  </style>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Services</a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="#">Contact</a>
+        </li>
+
+      </ul>
+    </div>
+
+  </div>
+</nav>
+
 </head>
 <body>
-  <header>
-    <div class="brand">
-      <div class="title">Wine Cellar Dashboard</div>
-      <div class="subtitle">Real‑time control — via Cloudflare Worker</div>
-    </div>
-    <div class="statusbar">
-      <span class="tag" id="conn">Connecting…</span>
-      <span class="tag" id="updated">—</span>
-      <span class="tag" id="latency">— ms</span>
-    </div>
-    <div class="statusbar" id="authbar" style="gap:8px; display:none">
-      <input id="lu" placeholder="user" style="width:120px"/>
-      <input id="lp" placeholder="password" type="password" style="width:140px"/>
-      <button class="btn-primary" id="lin">Login</button>
-      <button class="btn-ghost" id="lout" style="display:none">Logout</button>
-      <span class="tag" id="la"></span>
-    </div>
-  </header>
 
-  <section class="grid">
-    <div class="card kpi-card">
-      <h3>Temperature</h3>
-      <div class="kpi" id="temp">--.- °C</div>
-      <div class="meter"><i id="tempbar"></i></div>
-      <div class="row"><span class="tag" id="tempstate">—</span></div>
+
+<div id="carouselExample" class="carousel slide" data-bs-ride="carousel">
+  <div class="carousel-inner">
+
+    <div class="carousel-item active">
+      <img src="https://picsum.photos/1200/400?1" class="d-block w-100">
     </div>
 
-    <div class="card kpi-card">
-      <h3>Setpoint</h3>
-      <div class="kpi" id="setpt">--.- °C</div>
-      <div class="row">
-        <input id="spnum" type="number" step="0.1" min="6" max="20" style="width:110px" />
-        <input id="spslider" type="range" step="0.1" min="6" max="20" style="width:180px" />
-        <button class="btn-primary" id="apply">Apply</button>
-      </div>
+    <div class="carousel-item">
+      <img src="https://picsum.photos/1200/400?2" class="d-block w-100">
     </div>
 
-    <div class="card kpi-card">
-      <h3>AC State</h3>
-      <div class="kpi" id="ac">—</div>
-      <div class="row">
-        <button class="btn-primary" id="on">Turn ON</button>
-        <button class="btn-danger" id="off">Turn OFF</button>
-      </div>
+    <div class="carousel-item">
+      <img src="https://picsum.photos/1200/400?3" class="d-block w-100">
     </div>
 
-    <div class="card kpi-card">
-      <h3>Uptime</h3>
-      <div class="kpi" id="uptime">—</div>
-      <div class="row"><span class="tag" id="raw">—</span></div>
-    </div>
+  </div>
 
-    <div class="card half-card">
-      <h3>Quick Presets</h3>
-      <div class="row">
-        <button class="btn-ghost" data-sp="12">12 °C</button>
-        <button class="btn-ghost" data-sp="12.5">12.5 °C</button>
-        <button class="btn-ghost" data-sp="13">13 °C</button>
-        <button class="btn-ghost" data-sp="14">14 °C</button>
-        <button class="btn-ghost" data-sp="15">15 °C</button>
-      </div>
-    </div>
+  <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon"></span>
+  </button>
 
-    <div class="card half-card">
-      <h3>Notes</h3>
-      <div class="subtitle">Reads from <code>wine.status</code> and writes to <code>wine.dot.cmd</code> via your Cloudflare Worker.
-      Keep your Adafruit IO key server‑side in Worker variables.</div>
-    </div>
-  </section>
+  <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+    <span class="carousel-control-next-icon"></span>
+  </button>
+</div>
 
-  <div class="footer">© <span id="yr"></span> Wine Cellar · Frontend connected to Cloudflare Worker</div>
 
-  <script>
-    // === CONFIG: point to your Worker URL ===
-    const API = 'https://red-sky-882d.silic700.workers.dev';
 
-    const $ = (id) => document.getElementById(id);
-    const elTemp = $('temp'), elSet = $('setpt'), elAC = $('ac'), elUp = $('uptime');
-    const elConn = $('conn'), elUpd = $('updated'), elLat = $('latency'), elState=$('tempstate'), elRaw=$('raw');
-    const elBar = $('tempbar');
 
-    const spNum = $('spnum'), spSlider = $('spslider');
-    const btnApply = $('apply'), btnOn = $('on'), btnOff = $('off');
 
-    // Auth UI
-    const barAuth = $('authbar');
-    const inUser = $('lu');
-    const inPass = $('lp');
-    const btnIn  = $('lin');
-    const btnOut = $('lout');
-    const lblAuth= $('la');
 
-    let authed = false; // toggled after login/logout
 
-    function fmtUptime(s){ if(!Number.isFinite(+s)) return '—'; const d=Math.floor(s/86400),h=Math.floor((s%86400)/3600),m=Math.floor((s%3600)/60); return `${d}d ${h}h ${m}m`; }
 
-    function safeJSON(str){ try{ return JSON.parse(str); } catch{ return null; } }
 
-    async function timedFetch(url, init={}){
-      const t0 = performance.now();
-      // always include credentials so cookies (sid) are sent
-      const r = await fetch(url, { credentials:'include', ...init });
-      const t1 = performance.now();
-      elLat.textContent = `${Math.round(t1-t0)} ms`;
-      return r;
-    }
 
-    async function loadStatus(){
-      try{
-        elConn.textContent = 'Fetching…';
-        const r = await timedFetch(`${API}/api/status`);
-        if(!r.ok) throw new Error('status '+r.status);
-        let payload = await r.json();
-        // Worker returns the raw AIO array; normalize to the first element
-        const latest = Array.isArray(payload) ? (payload[0] || null) : payload;
-        if(!latest){ elConn.textContent='No data'; return; }
 
-        // latest.value should be a JSON string; parse defensively
-        const rawVal = latest.value;
-        let j = null;
-        if (rawVal && typeof rawVal === 'string' && rawVal.trim().startsWith('{')) {
-          try { j = JSON.parse(rawVal); } catch { j = null; }
-        }
-        if (!j || typeof j !== 'object') j = {};
 
-        const t = j.temp, sp = j.setpoint, ac = j.acIsOn, up = j.uptime_s;
 
-        elTemp.textContent = (t==null? '--.-' : (+t).toFixed(1)) + ' °C';
-        elSet.textContent = (sp==null? '--.-' : (+sp).toFixed(1)) + ' °C';
-        if(sp!=null){ spNum.value=(+sp).toFixed(1); spSlider.value=+sp; }
-        elAC.textContent = ac? 'ON' : 'OFF';
-        elAC.style.color = ac? 'var(--good)' : 'var(--muted)';
-        elUp.textContent = fmtUptime(+up||0);
-        elUpd.textContent = latest.created_at ? new Date(latest.created_at).toLocaleString() : '—';
-        const raw = rawVal || '';
-        elRaw.textContent = raw.length>60? raw.slice(0,60)+'…' : (raw || '—');
 
-        // temp bar (0–25 °C)
-        if(Number.isFinite(+t)){
-          const pct = Math.max(0, Math.min(100, (t/25)*100));
-          elBar.style.width = pct+'%';
-        }
-        if(t!=null && sp!=null){ elState.textContent = (+t)>(+sp)? 'Above setpoint' : 'At/Below setpoint'; }
-        elConn.textContent = 'OK';
-      }catch(e){ console.error(e); elConn.textContent = 'Error'; }
-    }
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-    // Controls
-    function setControlsEnabled(on){ [btnApply, btnOn, btnOff, spNum, spSlider].forEach(el=>{ el.disabled = !on; }); }
-    setControlsEnabled(false); // disabled until we know login state or worker allows anon
+<!-- Your JS -->
+<script src="js/script.js"></script>
 
-    async function login(u,p){
-      const r = await timedFetch(`${API}/auth/login`, {
-        method:'POST', headers:{'content-type':'application/json'},
-        body: JSON.stringify({ user:u, pass:p })
-      });
-      if(r.ok){ authed = true; lblAuth.textContent = 'Logged in'; btnOut.style.display='inline-block'; barAuth.style.display='none'; setControlsEnabled(true); }
-      else { authed = false; lblAuth.textContent = 'Login failed'; barAuth.style.display='flex'; setControlsEnabled(false); }
-      return r.ok;
-    }
-    async function logout(){
-      await timedFetch(`${API}/auth/logout`, { method:'POST' });
-      authed = false; lblAuth.textContent = 'Logged out'; btnOut.style.display='none'; barAuth.style.display='flex'; setControlsEnabled(false);
-    }
-
-    btnIn.addEventListener('click', async ()=>{ await login(inUser.value, inPass.value); });
-    btnOut.addEventListener('click', async ()=>{ await logout(); });
-
-    btnApply.addEventListener('click', async ()=>{
-      const v = parseFloat(spNum.value);
-      if(!Number.isFinite(v) || v<6 || v>20){ alert('Setpoint must be 6–20 °C'); return; }
-      const r = await timedFetch(`${API}/api/setpoint`, { method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify({ c:v }) });
-      if(r.status === 401){ barAuth.style.display='flex'; setControlsEnabled(false); return; }
-      await loadStatus();
-    });
-    spSlider.addEventListener('input', e=>{ spNum.value=(+e.target.value).toFixed(1); });
-    btnOn.addEventListener('click', async()=>{ const r = await timedFetch(`${API}/api/cmd`, { method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify({ value:'on' })}); if(r.status===401){ barAuth.style.display='flex'; setControlsEnabled(false); return;} await loadStatus(); });
-    btnOff.addEventListener('click', async()=>{ const r = await timedFetch(`${API}/api/cmd`, { method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify({ value:'off' })}); if(r.status===401){ barAuth.style.display='flex'; setControlsEnabled(false); return;} await loadStatus(); });
-
-    // Presets
-    document.querySelectorAll('[data-sp]').forEach(b=>{
-      b.addEventListener('click', async ()=>{
-        const v = parseFloat(b.getAttribute('data-sp'));
-        spNum.value = v.toFixed(1); spSlider.value = v;
-        const r = await timedFetch(`${API}/api/setpoint`, { method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify({ c:v }) });
-        if(r.status===401){ barAuth.style.display='flex'; setControlsEnabled(false); return; }
-        await loadStatus();
-      });
-    });
-
-    // Kickoff + intervals
-    $('yr').textContent = new Date().getFullYear();
-    (async()=>{ await loadStatus(); })();
-    setInterval(loadStatus, 10_000);
-
-    // Silent auth probe: try a protected endpoint; if 401 show login bar
-    (async()=>{
-      const r = await timedFetch(`${API}/api/cmd`, { method:'POST', headers:{'content-type':'application/json'}, body: JSON.stringify({ value:'noop' }) });
-      if(r.status===401){ barAuth.style.display='flex'; setControlsEnabled(false); }
-      else { authed = true; barAuth.style.display='none'; btnOut.style.display='inline-block'; setControlsEnabled(true); }
-    })();
-  </script>
 </body>
 </html>
