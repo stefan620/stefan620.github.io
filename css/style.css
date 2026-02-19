@@ -1,0 +1,108 @@
+/* fonts */
+h1, h2, .logo {
+  font-family: 'Playfair Display', serif;
+}
+
+body, p, input, button {
+  font-family: 'Montserrat', sans-serif;
+}
+
+/* Navbar */
+body {
+    padding-top: 80px;
+    background-color: #EDD2E0 ;
+}
+
+
+.navbar {
+    background: rgba(0,0,0,0.2);
+    backdrop-filter: blur(6px);
+}
+
+.nav-link {
+    color: white !important;
+}
+
+.nav-link:hover {
+    color: #797B84 !important;
+}
+/* About me */
+
+.card-body {
+    background-color: #EDD2E0;
+    border: none;
+}
+.col-md-8 {
+    background-color: #EDD2E0; 
+}
+
+.about-section {
+  
+}
+
+/* Contact */
+iframe {
+    display:block;
+}
+
+.card {
+    border-radius:20px;
+}
+
+form input,
+form textarea {
+    border-radius:12px;
+}
+
+.btn-dark:hover {
+    background:#c06ccf;
+}
+
+
+
+/* footer */
+.footer {
+    background: #BAA1A7;
+    color: white;
+}
+
+.footer-title {
+    margin-bottom: 15px;
+    color: white;
+}
+
+.footer a {
+    color: #bbb;
+    text-decoration: none;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.footer a:hover {
+    color: #f0c0ff;
+}
+
+.socials a {
+    margin-right: 15px;
+    font-weight: 500;
+}
+
+hr {
+    border-color: rgba(255,255,255,0.1);
+}
+
+
+/* .carousel-control-prev-icon,
+.carousel-control-next-icon {
+    background-color: black;
+    border-radius: 50%;
+    padding: 15px;
+} */
+
+.carousel-item {
+    transition: transform .6s ease-in-out;
+}
+.hero-img {
+    height: 100vh;
+    object-fit: cover;
+}
